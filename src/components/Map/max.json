@@ -1,0 +1,194 @@
+{
+    "version": 8,
+    "name": "OSM Liberty",
+    "metadata": {
+      "maputnik:license": "https://github.com/maputnik/osm-liberty/blob/gh-pages/LICENSE.md",
+      "maputnik:renderer": "mbgljs",
+      "openmaptiles:version": "3.x",
+      "maputnik:thunderforest_access_token": ""
+    },
+    "sources": {
+      "bg_sikkerhet": {
+        "type": "vector",
+        "tiles": [
+          "https://dev.7analytics.no:7801/public.bg_popden/{z}/{x}/{y}.pbf"
+        ],
+        "minZoom": 0,
+        "maxZoom": 14
+      },
+      "bg_befBol250": {
+        "type": "vector",
+        "tiles": [
+          "https://dev.7analytics.no:7801/public.bg_befbol250/{z}/{x}/{y}.pbf"
+        ],
+        "minZoom": 0,
+        "maxZoom": 14
+      }
+    },
+    "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
+    "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=pk.eyJ1IjoibWF4a2xyIiwiYSI6ImNrdjB1bjBnYzNjNjUyb3F2dWFtNzJ2ZG0ifQ.IaMYpGuD666n7jay0ViceQ",
+    "layers": [
+      {
+        "id": "bg_pop_den",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popden",
+        "filter": [
+          "any",
+          [
+            "in",
+            "bygningstype",
+            111,
+            112,
+            113,
+            121,
+            122,
+            123,
+            124,
+            131,
+            133,
+            135,
+            136,
+            141,
+            142,
+            143,
+            144,
+            145,
+            146,
+            151,
+            152,
+            159,
+            193,
+            199
+          ]
+        ],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": [
+            "interpolate",
+            ["linear"],
+            ["get", "pop_tot"],
+            6,
+            "#ffffd4",
+            31,
+            "#fec44f",
+            124,
+            "#fec44f",
+            312,
+            "#fe9929",
+            624,
+            "#d95f0e",
+            1249,
+            "#993404"
+          ],
+          "fill-outline-color": "rgba(139, 139, 139, 1)",
+          "fill-opacity": 1
+        }
+      },
+      {
+        "id": "bg_S2",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popden",
+        "filter": ["all", ["==", "sikkerhetsklasse", "S2"]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": "rgba(108, 216, 12, 1)",
+          "fill-outline-color": "rgba(193, 9, 9, 1)"
+        }
+      },
+      {
+        "id": "bg_S3",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popden",
+        "filter": ["all", ["==", "sikkerhetsklasse", "S3"]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": "rgba(255, 71, 71, 1)",
+          "fill-outline-color": "rgba(124, 255, 145, 1)"
+        }
+      },
+      {
+        "id": "bg_forste_ledd",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popden",
+        "filter": ["all", ["==", "sikkerhetsklasse", "Første ledd"]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": "rgba(0, 0, 0, 1)",
+          "fill-outline-color": "rgba(255, 0, 144, 1)"
+        }
+      },
+      {
+        "id": "bg_S1",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popden",
+        "filter": ["all", ["==", "sikkerhetsklasse", "S1"]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": "rgba(0, 43, 222, 1)",
+          "fill-outline-color": "rgba(124, 255, 145, 1)"
+        }
+      },
+      {
+        "id": "bg_boliger250",
+        "type": "fill",
+        "source": "bg_befBol250",
+        "source-layer": "public.bg_befbol250",
+        "filter": ["all", [">", "dwetodw", 0]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": [
+            "interpolate",
+            ["linear"],
+            ["get", "dwetodw"],
+            0,
+            "#dd1c77",
+            6,
+            "#006837",
+            31,
+            "#252525",
+            124,
+            "#d95f0e",
+            125,
+            "#993404"
+          ],
+          "fill-outline-color": "rgba(0, 0, 0, 1)"
+        }
+      },
+      {
+        "id": "bg_befolkning250",
+        "type": "fill",
+        "source": "bg_befBol250",
+        "source-layer": "public.bg_befbol250",
+        "filter": ["all", [">", "pop_tot", 0]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": [
+            "interpolate",
+            ["linear"],
+            ["get", "pop_tot"],
+            1,
+            "#ffffd4",
+            6,
+            "#fec44f",
+            124,
+            "#fec44f",
+            312,
+            "#fe9929",
+            624,
+            "#d95f0e",
+            1249,
+            "#993404",
+            3000,
+            "#e41a1c"
+          ],
+          "fill-outline-color": "rgba(0, 0, 0, 1)"
+        }
+      }
+    ],
+    "id": "osm-liberty"
+  }

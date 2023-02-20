@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "jsx": "preserve",
+      "baseUrl": "./src",
+      "paths": {
+        "@Components/*": ["./components/*"],
+        "@Pages/*": ["./pages/*"],
+        "@Core/*": ["./core/*"],
+        "@Api/*": ["./api/*"],
+      },
+    },
+  }

@@ -2,12 +2,8 @@ import React from 'react';
 import './shared.css';
 
 // Components
-import Welcome from '../components/Welcome/Welcome';
+// import Map from '@Components/Map/Map';
 
-const NotFound = () => (
-  <div className="page notfound">
-    <Welcome />
-  </div>
-);
+const NotFound = () => <div className="page notfound">{/* <Map /> */}</div>;
 
 export default NotFound;
