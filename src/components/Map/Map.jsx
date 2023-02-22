@@ -1,58 +1,49 @@
 // Description: Map component
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 
-//// Libraries ////
-// React Map GL
-import Map, {
-  Source,
-  Layer,
-  useControl,
-  NavigationControl,
-  FullscreenControl,
-  ScaleControl,
-  GeolocateControl,
-} from 'react-map-gl';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
-// MapLibre
+import Map, { useControl } from 'react-map-gl';
+
 import MapLibreGl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-// Mapbox Draw
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
-import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
+import './style.css';
 
-// API Services
-import MapDataService from '@Api/mapData';
+import LoadSources from './LoadSources';
+import MapControls from './MapControls';
+
+import DrawControl from './DrawControl';
+import ControlPanel from './ControlPanel';
+
+import './lib/maplibre-gl-inspect.css';
+import './lib/maplibre-gl-inspect.min.js';
 
 import Max from './max.json';
 
-function DrawControl(props) {
-  useControl(() => new MapboxDraw(props), {
-    position: props.position,
-  });
-
-  return null;
-}
-
 const MapComp = () => {
-  // Define states
   const mapSources = Max.sources;
   const mapLayers = Max.layers;
+  const options = [];
+  const optionsLabel = [];
+  mapLayers.map((layer) => {
+    options.push({ label: layer.id, value: layer });
+    optionsLabel.push(layer.id);
+  });
+
+  // console.log(options);
+
+  const baseMapStyle =
+    'https://api.maptiler.com/maps/e04fad8e-6ec8-4dd0-afda-eeef9d7ab030/style.json?key=4g2o5EcoGa5b3sc9qbM8';
+
   const mapRef = useRef();
-  const animatedComponents = makeAnimated();
+
+  const [features, setFeatures] = useState({});
   const [inputValue, setInputValue] = useState([]);
 
   const [viewState, setViewState] = React.useState({
     longitude: 5.324372871671272,
     latitude: 60.39275398399687,
     zoom: 13,
-  });
-
-  // // Define variables
-  const options = [];
-  mapLayers.forEach((layer) => {
-    // console.log(layer);
-    options.push({ label: layer.id, value: layer });
+    pitch: 0,
+    bearing: 0,
   });
 
   const setLayerVisibility = (layerId, visibility) => {
@@ -66,24 +57,11 @@ const MapComp = () => {
     newValue.map((newValue) => {
       setLayerVisibility(newValue.label, 'visible');
     });
-
     setInputValue(newValue);
-    console.log(newValue);
     return newValue;
   };
 
-  // UseEffect for fetching API data
-  useEffect(() => {
-    // MapDataService.getFile('public.bg_popden.json').then((resGetFile) => {
-    //   setMapData(resGetFile);
-    // });
-    // MapDataService.getAll().then((resGetAllFiles) => {
-    //   setAllMapData([resGetAllFiles]);
-    // });
-  }, []);
-
-  // Define action handlers
-  const onMove = React.useCallback(({ viewState }) => {
+  const onMove = useCallback(({ viewState }) => {
     const newCenter = [viewState.longitude, viewState.latitude];
     // Only update the view state if the center is inside the geofence
     if (true) {
@@ -92,64 +70,83 @@ const MapComp = () => {
     }
   }, []);
 
+  const onUpdate = useCallback((e) => {
+    setFeatures((currFeatures) => {
+      const newFeatures = { ...currFeatures };
+      for (const f of e.features) {
+        newFeatures[f.id] = f;
+      }
+      return newFeatures;
+    });
+  }, []);
+
+  const onDelete = useCallback((e) => {
+    setFeatures((currFeatures) => {
+      const newFeatures = { ...currFeatures };
+      for (const f of e.features) {
+        delete newFeatures[f.id];
+      }
+      return newFeatures;
+    });
+  }, []);
+
+  const onMapLoad = useCallback(() => {
+    mapRef.current.addControl(
+      new MaplibreInspect({
+        showMapPopup: true,
+        showInspectButton: false,
+        showMapPopupOnHover: false,
+        // showInspectMapPopupOnHover: false,
+        queryParameters: {
+          layers: optionsLabel,
+        },
+      })
+    );
+  }, []);
+  const [cursor, setCursor] = useState('auto');
+  const onMouseEnter = useCallback(() => setCursor('pointer'), []);
+  const onMouseLeave = useCallback(() => setCursor('auto'), []);
+
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center text-center text-dark">
       <Map
-        {...viewState}
-        ref={mapRef}
-        onMove={onMove}
         mapLib={MapLibreGl}
+        ref={mapRef}
+        onLoad={onMapLoad}
+        {...viewState}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="https://api.maptiler.com/maps/e04fad8e-6ec8-4dd0-afda-eeef9d7ab030/style.json?key=4g2o5EcoGa5b3sc9qbM8"
+        mapStyle={baseMapStyle}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onMove={onMove}
+        cursor={cursor}
+        interactiveLayerIds={optionsLabel}
       >
         <DrawControl
           position="top-left"
-          displayControlsDefault={true}
+          displayControlsDefault={false}
           controls={{
             polygon: true,
             trash: true,
           }}
+          onCreate={onUpdate}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
         />
 
-        <ScaleControl />
-        <NavigationControl position="bottom-right" />
-        <FullscreenControl position="bottom-right" />
-        <GeolocateControl position="bottom-right" />
+        {/* <InspectControls /> */}
 
-        {Object.keys(mapSources).map((sourceKey, i) => (
-          <Source
-            id={sourceKey}
-            key={sourceKey + '__' + i}
-            type={mapSources[sourceKey].type}
-            tiles={mapSources[sourceKey].tiles}
-          >
-            {mapLayers.map((layer) => {
-              if (layer.source === sourceKey) {
-                return <Layer key={layer.id} {...layer} />;
-              }
-              // Tune up needed in the future
-              return null;
-            })}
-          </Source>
-        ))}
+        <MapControls />
+
+        <LoadSources mapSources={mapSources} mapLayers={mapLayers} />
       </Map>
-      <div className="absolute top-5 right-5">
-        <div className="w-[450px] rounded-xl border border-gray-50 bg-white p-5 shadow-md">
-          <p className="text-md text-gray-700">Select your layers to display</p>
-          <div className="h-100 mt-4 w-full">
-            <Select
-              isMulti
-              name="layers"
-              options={options}
-              closeMenuOnSelect={false}
-              components={animatedComponents}
-              onChange={(newValue) => handleChange(newValue)}
-              className="basic-multi-select"
-              classNamePrefix="select"
-            />
-          </div>
-        </div>
-      </div>
+
+      <ControlPanel
+        polygons={Object.values(features)}
+        options={options}
+        handleChange={handleChange}
+        // changeDrawMode={changeDrawMode}
+      />
     </div>
   );
 };

@@ -22,6 +22,7 @@ export default defineConfig({
       '@Pages': resolve(__dirname, 'src/pages'),
       '@Core': resolve(__dirname, 'src/core'),
       '@Api': resolve(__dirname, 'src/api'),
+      
     },
   },
 });

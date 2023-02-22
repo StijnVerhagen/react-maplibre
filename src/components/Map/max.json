@@ -11,86 +11,71 @@
       "bg_sikkerhet": {
         "type": "vector",
         "tiles": [
-          "https://dev.7analytics.no:7801/public.bg_popden/{z}/{x}/{y}.pbf"
+          "https://dev.7analytics.no:7801/public.bg_popDenPerBolig_norge/{z}/{x}/{y}.pbf"
         ],
-        "minZoom": 0,
-        "maxZoom": 14
+        "minZoom": 4,
+        "maxZoom": 22
       },
       "bg_befBol250": {
         "type": "vector",
         "tiles": [
           "https://dev.7analytics.no:7801/public.bg_befbol250/{z}/{x}/{y}.pbf"
         ],
-        "minZoom": 0,
-        "maxZoom": 14
+        "minZoom": 4,
+        "maxZoom": 22
       }
     },
     "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
     "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=pk.eyJ1IjoibWF4a2xyIiwiYSI6ImNrdjB1bjBnYzNjNjUyb3F2dWFtNzJ2ZG0ifQ.IaMYpGuD666n7jay0ViceQ",
     "layers": [
       {
-        "id": "bg_pop_den",
+        "id": "bygninger_pop",
         "type": "fill",
         "source": "bg_sikkerhet",
-        "source-layer": "public.bg_popden",
-        "filter": [
-          "any",
-          [
-            "in",
-            "bygningstype",
-            111,
-            112,
-            113,
-            121,
-            122,
-            123,
-            124,
-            131,
-            133,
-            135,
-            136,
-            141,
-            142,
-            143,
-            144,
-            145,
-            146,
-            151,
-            152,
-            159,
-            193,
-            199
-          ]
-        ],
+        "source-layer": "public.bg_popDenPerBolig_norge",
         "layout": {"visibility": "none"},
         "paint": {
           "fill-color": [
-            "interpolate",
-            ["linear"],
+            "step",
             ["get", "pop_tot"],
+            "#FFFFD4",
             6,
-            "#ffffd4",
+            "#FEE391",
             31,
-            "#fec44f",
+            "#FEC44F",
             124,
-            "#fec44f",
+            "#FE9929",
             312,
-            "#fe9929",
+            "#EC7014",
             624,
-            "#d95f0e",
+            "#CC4C02",
             1249,
-            "#993404"
-          ],
-          "fill-outline-color": "rgba(139, 139, 139, 1)",
-          "fill-opacity": 1
+            "#8C2D04"
+          ]
+        },
+        "filter": [
+          "all",
+          ["!=", "pop_tot", 9999]
+        ]
+      },
+      {
+        "id": "Safety 1",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popDenPerBolig_norge",
+        "filter": ["all", ["==", "Sikkerhetsklasse", "S1"]],
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": "rgba(0, 43, 222, 1)",
+          "fill-outline-color": "rgba(124, 255, 145, 1)"
         }
       },
       {
-        "id": "bg_S2",
+        "id": "Safety 2",
         "type": "fill",
         "source": "bg_sikkerhet",
-        "source-layer": "public.bg_popden",
-        "filter": ["all", ["==", "sikkerhetsklasse", "S2"]],
+        "source-layer": "public.bg_popDenPerBolig_norge",
+        "filter": ["all", ["==", "Sikkerhetsklasse", "S2"]],
         "layout": {"visibility": "none"},
         "paint": {
           "fill-color": "rgba(108, 216, 12, 1)",
@@ -98,11 +83,11 @@
         }
       },
       {
-        "id": "bg_S3",
+        "id": "Safety 3",
         "type": "fill",
         "source": "bg_sikkerhet",
-        "source-layer": "public.bg_popden",
-        "filter": ["all", ["==", "sikkerhetsklasse", "S3"]],
+        "source-layer": "public.bg_popDenPerBolig_norge",
+        "filter": ["all", ["==", "Sikkerhetsklasse", "S3"]],
         "layout": {"visibility": "none"},
         "paint": {
           "fill-color": "rgba(255, 71, 71, 1)",
@@ -113,24 +98,12 @@
         "id": "bg_forste_ledd",
         "type": "fill",
         "source": "bg_sikkerhet",
-        "source-layer": "public.bg_popden",
+        "source-layer": "public.bg_popDenPerBolig_norge",
         "filter": ["all", ["==", "sikkerhetsklasse", "Første ledd"]],
         "layout": {"visibility": "none"},
         "paint": {
           "fill-color": "rgba(0, 0, 0, 1)",
           "fill-outline-color": "rgba(255, 0, 144, 1)"
-        }
-      },
-      {
-        "id": "bg_S1",
-        "type": "fill",
-        "source": "bg_sikkerhet",
-        "source-layer": "public.bg_popden",
-        "filter": ["all", ["==", "sikkerhetsklasse", "S1"]],
-        "layout": {"visibility": "none"},
-        "paint": {
-          "fill-color": "rgba(0, 43, 222, 1)",
-          "fill-outline-color": "rgba(124, 255, 145, 1)"
         }
       },
       {
