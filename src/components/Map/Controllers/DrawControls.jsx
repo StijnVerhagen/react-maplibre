@@ -6,12 +6,12 @@ export default function DrawControl(props) {
   useControl(
     () => new MapboxDraw(props),
     ({ map }) => {
-      map.on('draw.create', props.onDrawCreate);
+      map.on('draw.create', props.onDrawUpdate);
       map.on('draw.update', props.onDrawUpdate);
       map.on('draw.delete', props.onDrawDelete);
     },
     ({ map }) => {
-      map.off('draw.create', props.onDrawCreate);
+      map.off('draw.create', props.onDrawUpdate);
       map.off('draw.update', props.onDrawUpdate);
       map.off('draw.delete', props.onDrawDelete);
     },

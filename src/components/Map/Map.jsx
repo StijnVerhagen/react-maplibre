@@ -79,6 +79,34 @@ const MapComp = () => {
     }
   }, []);
 
+  // const onDrawFilter = (features) => {
+  //   if (Symbol.iterator in Object(features)) {
+  //     for (const feature of features) {
+  //       console.log(feature);
+  //     }
+  //   }
+
+  //   // for (const feature of features) {
+  //   console.log(features);
+  //   // }
+
+  //   // If feature is a polygon
+  //   // if (feature.geometry.type === 'Polygon') {
+  //   //   // Create a turf polygon from the feature
+  //   //   const turfPolygon = turf.polygon(f.geometry.coordinates);
+  //   //   // Check if the polygon intersects with the other visible features of the map
+  //   //   // Loop through the intersecting features
+  //   //   for (const intersectingFeature of intersectingFeatures) {
+  //   //   }
+  //   // }
+
+  //   // const visibleFeaturesAsLayers = mapRef.current.queryRenderedFeatures(layer, {
+  //   //   // filter: ['!=', 'id', f.id],
+  //   //   filter: ['all', ['!=', 'id', props.f.id], ['==', 'type', 'Polygon']],
+  //   // });
+  //   // console.log(visibleFeaturesAsLayers);
+  // };
+
   // Create/update drawn features
   const onDrawUpdate = useCallback((e) => {
     setDrawnFeatures((currFeatures) => {
@@ -86,33 +114,12 @@ const MapComp = () => {
       for (const f of e.features) {
         newFeatures[f.id] = f;
       }
+
+      // Somewhere here loop through all drawn features and check if they intersect
+      // onDrawFilter(newFeatures);
+
       return newFeatures;
     });
-
-    // // features;
-    // console.log(drawnFeatures);
-
-    // optionsLabel.map((layer) => {
-    //   const visibleFeaturesAsLayers = mapRef.current.queryRenderedFeatures({
-    //     layers: layer,
-    //     // filter: ['!=', 'id', f.id],
-    //     filter: ['all', ['!=', 'id', f.id], ['==', 'type', 'Polygon']],
-    //   });
-
-    //   // Grab all drawn features and loop them
-    //   for (const f of e.features) {
-    //     // If feature is a polygon
-
-    //     if (f.geometry.type === 'Polygon') {
-    //       // Create a turf polygon from the feature
-    //       const turfPolygon = turf.polygon(f.geometry.coordinates);
-    //       // Check if the polygon intersects with the other visible features of the map
-    //       // Loop through the intersecting features
-    //       for (const intersectingFeature of intersectingFeatures) {
-    //       }
-    //     }
-    //   }
-    // }, []);
   }, []);
 
   // Delete drawn features
@@ -149,6 +156,7 @@ const MapComp = () => {
           hoveredStateId = e.features[0].id;
           hoveredStateSource = e.features[0].source;
           hoveredStateSourceLayer = e.features[0].sourceLayer;
+          console.log(e.features[0]);
 
           mapRef.current.setFeatureState(
             { id: hoveredStateId, source: e.features[0].source, sourceLayer: e.features[0].sourceLayer },
@@ -233,7 +241,6 @@ const MapComp = () => {
 
         <SourceLoader map={mapRef.current} mapSources={mapSources} mapLayers={mapLayers} />
       </Map>
-
       <ControlPanel
         polygons={Object.values(drawnFeatures)}
         options={options}

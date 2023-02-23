@@ -39,11 +39,60 @@
         ],
         "minZoom": 0,
         "maxZoom": 14
+      },
+      "sf_adt": {
+        "type": "vector",
+        "tiles": [
+          "https://dev.7analytics.no:7801/public.sf_nvdb_adt/{z}/{x}/{y}.pbf"
+        ],
+        "minZoom": 0,
+        "maxZoom": 14
       }
     },
     "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
     "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=pk.eyJ1IjoibWF4a2xyIiwiYSI6ImNrdjB1bjBnYzNjNjUyb3F2dWFtNzJ2ZG0ifQ.IaMYpGuD666n7jay0ViceQ",
     "layers": [
+      {
+        "id": "sf adt",
+        "type": "line",
+        "source": "sf_adt",
+        "source-layer": "public.sf_nvdb_adt",
+        "layout": {"visibility": "none"},
+        "paint": {
+          "line-width": [
+            "match",
+            ["get", "vegkategori"],
+            "E",
+            6,
+            "R",
+            5,
+            "F",
+            5,
+            "K",
+            3,
+            "P",
+            2,
+            "S",
+            2,
+            1
+          ],
+          "line-color": [
+            "interpolate",
+            ["linear"],
+            ["get", "ÅDT, total"],
+            200,
+            "#ffffcc",
+            550,
+            "#c7e9b4",
+            1900,
+            "#7fcdbb",
+            5400,
+            "#1d91c0",
+            225000,
+            "#0c2c84"
+          ]
+        }
+      },
       {
         "id": "bg_bolbef250",
         "type": "fill",
