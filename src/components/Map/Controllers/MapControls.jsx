@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavigationControl, FullscreenControl, ScaleControl, GeolocateControl } from 'react-map-gl';
-const MapControls = () => {
+const MapControls = (props) => {
   return (
     <>
       <ScaleControl />
-      <NavigationControl position="bottom-right" />
-      <FullscreenControl position="bottom-right" />
-      <GeolocateControl position="bottom-right" />
+      <NavigationControl position={props.position} />
+      <FullscreenControl position={props.position} />
+      <GeolocateControl position={props.position} />
     </>
   );
 };

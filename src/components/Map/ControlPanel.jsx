@@ -29,17 +29,25 @@ function ControlPanel({ polygons, options, handleChange, changeDrawMode }) {
             classNamePrefix="select"
           />
         </div>
-        <button className="mr-5 mt-5" onClick={() => changeDrawMode('draw_circle')}>
+        {/* <button className="mr-5 mt-5" onClick={() => changeDrawMode('draw_circle')}>
           Draw circle mode
         </button>
-        <button onClick={() => changeDrawMode('drag_circle')}>Drag circle mode</button>
+        <button onClick={() => changeDrawMode('drag_circle')}>Drag circle mode</button> */}
         <div className="control-panel mt-5 rounded-xl bg-slate-50 p-5">
-          <h4>Draw Polygon</h4>
-          {polygonArea > 0 && (
-            <p>
-              {Math.round(polygonArea * 100) / 100} <br />
-              square meters
-            </p>
+          {polygonArea > 0 ? (
+            <>
+              <p style={{ fontWeight: 'bold' }}>
+                {Math.round(polygonArea * 100) / 100} <br />
+              </p>
+              <p>square meters</p>
+            </>
+          ) : (
+            <>
+              <p style={{ fontWeight: 'bold' }}>
+                0 <br />
+              </p>
+              <p>square meters</p>
+            </>
           )}
         </div>
       </div>

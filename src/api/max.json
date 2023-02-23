@@ -23,11 +23,84 @@
         ],
         "minZoom": 4,
         "maxZoom": 22
+      },
+      "na_ku_naturtyper": {
+        "type": "vector",
+        "tiles": [
+          "https://dev.7analytics.no:7801/public.na_ku_naturtyper/{z}/{x}/{y}.pbf"
+        ],
+        "minZoom": 0,
+        "maxZoom": 14
+      },
+      "bg_bolbef250": {
+        "type": "vector",
+        "tiles": [
+          "https://dev.7analytics.no:7801/public.bg_bolbef250_norge/{z}/{x}/{y}.pbf"
+        ],
+        "minZoom": 0,
+        "maxZoom": 14
       }
     },
     "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
     "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=pk.eyJ1IjoibWF4a2xyIiwiYSI6ImNrdjB1bjBnYzNjNjUyb3F2dWFtNzJ2ZG0ifQ.IaMYpGuD666n7jay0ViceQ",
     "layers": [
+      {
+        "id": "bg_bolbef250",
+        "type": "fill",
+        "source": "bg_bolbef250",
+        "source-layer": "public.bg_bolbef250_norge",
+        "paint": {
+          "fill-color": [
+            "step",
+            ["get", "pop_tot"],
+            "#FFFFD4",
+            6,
+            "#FEE391",
+            31,
+            "#FEC44F",
+            124,
+            "#FE9929",
+            312,
+            "#EC7014",
+            624,
+            "#CC4C02",
+            1249,
+            "#8C2D04"
+          ],
+          "fill-opacity": ["literal", 1]
+        },
+        "filter": ["any", [">", "pop_tot", 0]],
+        "layout": {"visibility": "none"}
+
+      },
+      {
+        "id": "na_ku_naturtyper",
+        "type": "fill",
+        "source": "na_ku_naturtyper",
+        "source-layer": "public.na_ku_naturtyper",
+        "paint": {
+          "fill-color": [
+            "match",
+            ["get", "Verdikategori"],
+            "Svært stor verdi",
+            "#238443",
+            "Stor verdi",
+            "#78c679",
+            "Middels verdi",
+            "#c2e699",
+            "Noe verdi",
+            "#ffffcc",
+            "Vurderes per naturtype",
+            "#decbe4",
+            "Vurderes per lokalitet",
+            "#b3cde3",
+            "Ikke gitt verdi",
+            "#eff3ff",
+            "white"
+          ]
+        },
+        "layout": {"visibility": "none"}
+      },
       {
         "id": "bygninger_pop",
         "type": "fill",
@@ -57,6 +130,29 @@
           "all",
           ["!=", "pop_tot", 9999]
         ]
+      },
+      {
+        "id": "bygninger_s_classes",
+        "type": "fill",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popDenPerBolig_norge",
+        "layout": {"visibility": "none"},
+        "paint": {
+          "fill-color": [
+            "match",
+            ["get", "Sikkerhetsklasse"],
+            "S1",
+            "purple",
+            "S2",
+            "green",
+            "S3",
+            "blue",
+            "Første ledd",
+            "red",
+            "white"
+          ]
+        },
+        "filter": ["all"]
       },
       {
         "id": "Safety 1",

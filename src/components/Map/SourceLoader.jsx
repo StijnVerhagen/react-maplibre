@@ -1,13 +1,14 @@
 import React from 'react';
 import { Source, Layer } from 'react-map-gl';
 
-const LoadSources = ({ mapSources, mapLayers }) => {
+const SourceLoader = ({ map, mapSources, mapLayers }) => {
   return (
     <>
       {' '}
       {Object.keys(mapSources).map((sourceKey, i) => (
         <Source
           id={sourceKey}
+          promoteId="bygningsnummer"
           key={sourceKey + '__' + i}
           type={mapSources[sourceKey].type}
           maxzoom={mapSources[sourceKey].maxZoom}
@@ -16,6 +17,16 @@ const LoadSources = ({ mapSources, mapLayers }) => {
         >
           {mapLayers.map((layer) => {
             if (layer.source === sourceKey) {
+              // Set feature state of on click
+              layer.paint['fill-color'] = [
+                'case',
+                ['boolean', ['feature-state', 'active'], false],
+                '#0000ff',
+                layer.paint['fill-color'],
+              ];
+              // Set feature state of on hover
+              layer.paint['fill-opacity'] = ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.4];
+
               return <Layer key={layer.id} {...layer} />;
             }
             // Tune up needed in the future
@@ -27,4 +38,4 @@ const LoadSources = ({ mapSources, mapLayers }) => {
   );
 };
 
-export default LoadSources;
+export default SourceLoader;
