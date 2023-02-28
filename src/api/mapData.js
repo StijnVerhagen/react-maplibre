@@ -10,7 +10,7 @@ const getFile = async (file) =>
   api
     .get(`/${file}`)
     .then((res) => res.data)
-    .catch((err) => Promise.reject(err.response.data));
+    .catch((err) => Promise.reject(err.response));
 
 
 const MapDataService = {

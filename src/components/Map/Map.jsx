@@ -13,6 +13,9 @@ import MapControls from './Controllers/MapControls';
 import DrawControls from './Controllers/DrawControls';
 import InspectControls from './Controllers/InspectControls';
 
+import checkIntersection from './Functions/checkIntersection';
+import useMapInteractions from './Functions/useMapInteractions';
+
 import SourceLoader from './SourceLoader';
 import ControlPanel from './ControlPanel';
 
@@ -27,7 +30,7 @@ const MapComp = () => {
   const mapLayers = Max.layers;
 
   const options = [];
-  const optionsLabel = [];
+  const layerOptions = [];
 
   const [drawnFeatures, setDrawnFeatures] = useState({});
   const [inputValue, setInputValue] = useState([]);
@@ -46,7 +49,7 @@ const MapComp = () => {
   // Set layer values and labels for control panel
   mapLayers.map((layer) => {
     options.push({ label: layer.id, value: layer });
-    optionsLabel.push(layer.id);
+    layerOptions.push(layer.id);
   });
 
   // Set layer visibility on input field change
@@ -79,33 +82,9 @@ const MapComp = () => {
     }
   }, []);
 
-  // const onDrawFilter = (features) => {
-  //   if (Symbol.iterator in Object(features)) {
-  //     for (const feature of features) {
-  //       console.log(feature);
-  //     }
-  //   }
-
-  //   // for (const feature of features) {
-  //   console.log(features);
-  //   // }
-
-  //   // If feature is a polygon
-  //   // if (feature.geometry.type === 'Polygon') {
-  //   //   // Create a turf polygon from the feature
-  //   //   const turfPolygon = turf.polygon(f.geometry.coordinates);
-  //   //   // Check if the polygon intersects with the other visible features of the map
-  //   //   // Loop through the intersecting features
-  //   //   for (const intersectingFeature of intersectingFeatures) {
-  //   //   }
-  //   // }
-
-  //   // const visibleFeaturesAsLayers = mapRef.current.queryRenderedFeatures(layer, {
-  //   //   // filter: ['!=', 'id', f.id],
-  //   //   filter: ['all', ['!=', 'id', props.f.id], ['==', 'type', 'Polygon']],
-  //   // });
-  //   // console.log(visibleFeaturesAsLayers);
-  // };
+  const onDrawFilter = (features) => {
+    checkIntersection(features, layerOptions, mapRef);
+  };
 
   // Create/update drawn features
   const onDrawUpdate = useCallback((e) => {
@@ -114,10 +93,8 @@ const MapComp = () => {
       for (const f of e.features) {
         newFeatures[f.id] = f;
       }
-
-      // Somewhere here loop through all drawn features and check if they intersect
-      // onDrawFilter(newFeatures);
-
+      // Loop through all drawn features and check if they intersect
+      onDrawFilter(newFeatures);
       return newFeatures;
     });
   }, []);
@@ -135,80 +112,56 @@ const MapComp = () => {
 
   const onMapLoad = useCallback(() => {
     // Run inspect controls function
-    InspectControls(mapRef.current, optionsLabel);
+    InspectControls(mapRef.current, layerOptions);
 
-    var hoveredStateId = null;
-    var hoveredStateSource = null;
-    var hoveredStateSourceLayer = null;
+    let hoveredState = { id: null, source: null, sourceLayer: null };
 
-    optionsLabel.map((layer) => {
-      /////// Hover effect
+    layerOptions.forEach((layer) => {
+      // Hover effect
       // On hover give hover state effect
-      // TODO: Put in own function
-      mapRef.current.on('mousemove', layer, function (e) {
+      const onLayerHover = (e) => {
         if (e.features.length > 0) {
-          if (hoveredStateId) {
-            mapRef.current.setFeatureState(
-              { id: hoveredStateId, source: e.features[0].source, sourceLayer: e.features[0].sourceLayer },
-              { hover: false }
-            );
+          const feature = e.features[0];
+          const { id, source, sourceLayer } = feature;
+          if (id !== hoveredState.id || source !== hoveredState.source || sourceLayer !== hoveredState.sourceLayer) {
+            if (hoveredState.id) {
+              mapRef.current.setFeatureState(
+                { id: hoveredState.id, source: hoveredState.source, sourceLayer: hoveredState.sourceLayer },
+                { hover: false }
+              );
+            }
+            hoveredState = { id, source, sourceLayer };
+            mapRef.current.setFeatureState({ id, source, sourceLayer }, { hover: true });
           }
-          hoveredStateId = e.features[0].id;
-          hoveredStateSource = e.features[0].source;
-          hoveredStateSourceLayer = e.features[0].sourceLayer;
-          console.log(e.features[0]);
-
-          mapRef.current.setFeatureState(
-            { id: hoveredStateId, source: e.features[0].source, sourceLayer: e.features[0].sourceLayer },
-            { hover: true }
-          );
         }
-      });
+      };
+      mapRef.current.on('mousemove', layer, onLayerHover);
+
       // On leave reset hover state effect
-      mapRef.current.on('mouseleave', layer, function () {
-        if (hoveredStateId) {
+      const onLayerLeave = () => {
+        if (hoveredState.id) {
           mapRef.current.setFeatureState(
-            { id: hoveredStateId, source: hoveredStateSource, sourceLayer: hoveredStateSourceLayer },
+            { id: hoveredState.id, source: hoveredState.source, sourceLayer: hoveredState.sourceLayer },
             { hover: false }
           );
+          hoveredState = { id: null, source: null, sourceLayer: null };
         }
-        hoveredStateId, hoveredStateSource, (hoveredStateSourceLayer = null);
-      });
+      };
+      mapRef.current.on('mouseleave', layer, onLayerLeave);
 
-      /////// Click effect
-      mapRef.current.on('click', layer, (e) => {
-        // Center map on polygon camera animation
-        // TODO: Put in own function
-        // var point = turf.centerOfMass(turf.polygon(e.features[0].geometry.coordinates));
-        // mapRef.current.flyTo({
-        //   center: point.geometry.coordinates,
-        //   essential: true,
-        //   speed: 0.3,
-        // });
-
-        // Toggle active state and select feature
-        // TODO: Make these store in state
-        if (hoveredStateId) {
-          if (
-            mapRef.current.getFeatureState({
-              id: hoveredStateId,
-              source: hoveredStateSource,
-              sourceLayer: hoveredStateSourceLayer,
-            }).active
-          ) {
-            mapRef.current.setFeatureState(
-              { id: hoveredStateId, source: hoveredStateSource, sourceLayer: hoveredStateSourceLayer },
-              { active: false }
-            );
-          } else {
-            mapRef.current.setFeatureState(
-              { id: hoveredStateId, source: hoveredStateSource, sourceLayer: hoveredStateSourceLayer },
-              { active: true }
-            );
+      // Click effect
+      const onLayerClick = (e) => {
+        if (e.features.length > 0) {
+          const feature = e.features[0];
+          const { id, source, sourceLayer } = feature;
+          if (hoveredState.id === id && hoveredState.source === source && hoveredState.sourceLayer === sourceLayer) {
+            const active = !mapRef.current.getFeatureState({ id, source, sourceLayer }).active;
+            mapRef.current.setFeatureState({ id, source, sourceLayer }, { active });
           }
         }
-      });
-    }, []);
+      };
+      mapRef.current.on('click', layer, onLayerClick);
+    });
   }, []);
 
   return (
@@ -224,7 +177,7 @@ const MapComp = () => {
         onMouseLeave={onMouseLeave}
         onMove={onMapMove}
         cursor={cursor}
-        interactiveLayerIds={optionsLabel}
+        interactiveLayerIds={layerOptions}
       >
         <DrawControls
           position="top-left"

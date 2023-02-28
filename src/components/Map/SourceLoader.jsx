@@ -8,7 +8,8 @@ const SourceLoader = ({ map, mapSources, mapLayers }) => {
       {Object.keys(mapSources).map((sourceKey, i) => (
         <Source
           id={sourceKey}
-          promoteId="nvdbId"
+          promoteId="bygningsnummer"
+          // promoteId="nvdbId"
           key={sourceKey + '__' + i}
           type={mapSources[sourceKey].type}
           maxzoom={mapSources[sourceKey].maxZoom}
@@ -17,6 +18,7 @@ const SourceLoader = ({ map, mapSources, mapLayers }) => {
         >
           {mapLayers.map((layer) => {
             if (layer.source === sourceKey) {
+              // console.log(layer);
               // Set feature state of on click
               if (layer.type === 'fill') {
                 layer.paint['fill-color'] = [
@@ -35,7 +37,8 @@ const SourceLoader = ({ map, mapSources, mapLayers }) => {
                   layer.paint['line-color'],
                 ];
                 // Set feature state of on hover
-                layer.paint['line-opacity'] = ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.4];
+                layer.paint['line-opacity'] = ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.6];
+                layer.paint['line-width'] = ['interpolate', ['exponential', 1], ['zoom'], 15, 1, 20, 15];
               }
 
               return <Layer key={layer.id} {...layer} />;

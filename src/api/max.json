@@ -53,6 +53,33 @@
     "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=pk.eyJ1IjoibWF4a2xyIiwiYSI6ImNrdjB1bjBnYzNjNjUyb3F2dWFtNzJ2ZG0ifQ.IaMYpGuD666n7jay0ViceQ",
     "layers": [
       {
+        "id": "bg_bygninger_pop",
+        "type": "line",
+        "source": "bg_sikkerhet",
+        "source-layer": "public.bg_popDenPerBolig_norge",
+        "layout": {"visibility": "none"},
+        "filter": [
+          "all",
+          ["!=", "pop_tot", 9999]
+        ],
+        "paint": {
+          "line-color": [
+            "match",
+            ["get", "Sikkerhetsklasse"],
+            "S1",
+            "#ffffcc",
+            "S2",
+            "#a1dab4",
+            "S3",
+            "#41b6c4",
+            "Første ledd",
+            "#cb181d",
+            "white"
+          ],
+          "line-width": 1.5
+        }
+      },
+      {
         "id": "sf adt",
         "type": "line",
         "source": "sf_adt",
