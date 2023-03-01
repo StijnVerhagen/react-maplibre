@@ -19,7 +19,7 @@
     "@vitejs/plugin-react": "^3.0.1",
     "ajax": "^0.0.4",
     "axios": "^1.3.3",
-    "deck.gl": "^8.8.25",
+    "deck.gl": "^8.8.26",
     "dotenv": "^16.0.3",
     "mapbox-gl": "^2.12.1",
     "mapbox-gl-inspect": "^1.3.1",
