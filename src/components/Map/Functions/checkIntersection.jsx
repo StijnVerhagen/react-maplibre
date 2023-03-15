@@ -1,7 +1,7 @@
 import React from 'react';
 import * as turf from '@turf/turf';
 
-const checkIntersection = (features, layerOptions, mapRef) => {
+const checkIntersection = (features, layerOptions, mapRef, onIntersectionFound) => {
   const geometryToTurfFn = {
     Polygon: (coords) => turf.polygon(coords),
     LineString: (coords) => turf.lineString(coords),
@@ -21,11 +21,12 @@ const checkIntersection = (features, layerOptions, mapRef) => {
       const drawnTGeometry = geometryToTurfFn[type](coordinates);
       layerOptions.forEach((layer) => {
         const visibleFeaturesAsLayers = mapRef.current.queryRenderedFeatures({ layers: [layer] });
+
         visibleFeaturesAsLayers.forEach((feature) => {
           if (feature.geometry.type in geometryToTurfFn) {
             const intersectingTGeometry = geometryToTurfFn[feature.geometry.type](feature.geometry.coordinates);
             if (turf.booleanIntersects(drawnTGeometry, intersectingTGeometry)) {
-              console.log(geometryTypeToString[feature.geometry.type]);
+              onIntersectionFound(feature);
             }
           }
         });

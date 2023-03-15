@@ -57,7 +57,7 @@
         "type": "line",
         "source": "bg_sikkerhet",
         "source-layer": "public.bg_popDenPerBolig_norge",
-        "layout": {"visibility": "none"},
+        "layout": {"visibility": "visible"},
         "filter": [
           "all",
           ["!=", "pop_tot", 9999]
@@ -84,7 +84,7 @@
         "type": "line",
         "source": "sf_adt",
         "source-layer": "public.sf_nvdb_adt",
-        "layout": {"visibility": "none"},
+        "layout": {"visibility": "visible"},
         "paint": {
           "line-width": [
             "match",

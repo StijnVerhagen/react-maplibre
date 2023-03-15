@@ -1,7 +1,7 @@
 // Description: Map component
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 
-import Map, { useControl } from 'react-map-gl';
+import Map, { useControl, useMap } from 'react-map-gl';
 
 import MapLibreGl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -14,7 +14,7 @@ import DrawControls from './Controllers/DrawControls';
 import InspectControls from './Controllers/InspectControls';
 
 import checkIntersection from './Functions/checkIntersection';
-import useMapInteractions from './Functions/useMapInteractions';
+import layerGroups from './Functions/layerGroups';
 
 import SourceLoader from './SourceLoader';
 import ControlPanel from './ControlPanel';
@@ -46,6 +46,17 @@ const MapComp = () => {
     bearing: 0,
   });
 
+  // const createGroup = (group) => {
+  //   const groupLayers = [];
+  //   var layer1 = mapRef.current.getLayer('bg_bygninger_pop');
+  //   var layer2 = mapRef.current.getLayer('sf adt');
+
+  //   groupLayers.push(layer1);
+  //   groupLayers.push(layer2);
+  //   console.log(groupLayers);
+  //   // layerGroups.addGroup(mapRef.current, 1, );
+  // };
+
   // Set layer values and labels for control panel
   mapLayers.map((layer) => {
     options.push({ label: layer.id, value: layer });
@@ -67,6 +78,13 @@ const MapComp = () => {
     return mapRef.current.getMap().setLayoutProperty(layerId, 'visibility', visibility);
   };
 
+  const setLayerActiveState = (feature) => {
+    console.log(feature);
+    const { id, source, sourceLayer } = feature;
+    const active = !mapRef.current.getFeatureState({ id, source, sourceLayer }).active;
+    mapRef.current.setFeatureState({ id, source, sourceLayer }, { active });
+  };
+
   // Set cursor style on mouse move over extra layer
   // TODO: Make this layer specific
   const onMouseEnter = useCallback(() => setCursor('pointer'), []);
@@ -82,8 +100,8 @@ const MapComp = () => {
     }
   }, []);
 
-  const onDrawFilter = (features) => {
-    checkIntersection(features, layerOptions, mapRef);
+  const handleIntersectionFound = (feature) => {
+    setLayerActiveState(feature);
   };
 
   // Create/update drawn features
@@ -94,7 +112,8 @@ const MapComp = () => {
         newFeatures[f.id] = f;
       }
       // Loop through all drawn features and check if they intersect
-      onDrawFilter(newFeatures);
+      checkIntersection(newFeatures, layerOptions, mapRef, handleIntersectionFound);
+
       return newFeatures;
     });
   }, []);
@@ -135,7 +154,6 @@ const MapComp = () => {
           }
         }
       };
-      mapRef.current.on('mousemove', layer, onLayerHover);
 
       // On leave reset hover state effect
       const onLayerLeave = () => {
@@ -147,19 +165,14 @@ const MapComp = () => {
           hoveredState = { id: null, source: null, sourceLayer: null };
         }
       };
-      mapRef.current.on('mouseleave', layer, onLayerLeave);
 
       // Click effect
       const onLayerClick = (e) => {
-        if (e.features.length > 0) {
-          const feature = e.features[0];
-          const { id, source, sourceLayer } = feature;
-          if (hoveredState.id === id && hoveredState.source === source && hoveredState.sourceLayer === sourceLayer) {
-            const active = !mapRef.current.getFeatureState({ id, source, sourceLayer }).active;
-            mapRef.current.setFeatureState({ id, source, sourceLayer }, { active });
-          }
-        }
+        setLayerActiveState(e.features[0]);
       };
+
+      mapRef.current.on('mousemove', layer, onLayerHover);
+      mapRef.current.on('mouseleave', layer, onLayerLeave);
       mapRef.current.on('click', layer, onLayerClick);
     });
   }, []);
@@ -200,6 +213,9 @@ const MapComp = () => {
         handleChange={handleChange}
         // changeDrawMode={changeDrawMode}
       />
+      {/* <button className="btn button" onClick={createGroup()}>
+        Create group
+      </button> */}
     </div>
   );
 };

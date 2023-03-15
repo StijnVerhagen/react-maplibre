@@ -102,7 +102,7 @@ const ControlPanel = ({ polygons, options, handleChange, changeDrawMode }) => {
           )}
         </div>
       </div>
-      <div className="mt-5 rounded-xl border border-gray-50 bg-white p-1 shadow-md">
+      {/* <div className="mt-5 rounded-xl border border-gray-50 bg-white p-1 shadow-md">
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
             <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
@@ -149,7 +149,7 @@ const ControlPanel = ({ polygons, options, handleChange, changeDrawMode }) => {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

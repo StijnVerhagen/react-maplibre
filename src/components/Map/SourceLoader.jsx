@@ -23,22 +23,42 @@ const SourceLoader = ({ map, mapSources, mapLayers }) => {
               if (layer.type === 'fill') {
                 layer.paint['fill-color'] = [
                   'case',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  '#ff0033',
                   ['boolean', ['feature-state', 'active'], false],
-                  '#0000ff',
+                  '#ff0033',
                   layer.paint['fill-color'],
                 ];
                 // Set feature state of on hover
-                layer.paint['fill-opacity'] = ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.4];
+                layer.paint['fill-opacity'] = [
+                  'case',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  1,
+                  ['boolean', ['feature-state', 'active'], false],
+                  1,
+                  0.4,
+                ];
               } else if (layer.type === 'line') {
                 layer.paint['line-color'] = [
                   'case',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  '#ff0033',
                   ['boolean', ['feature-state', 'active'], false],
-                  '#0000ff',
+                  '#ff0033',
                   layer.paint['line-color'],
                 ];
                 // Set feature state of on hover
-                layer.paint['line-opacity'] = ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.6];
-                layer.paint['line-width'] = ['interpolate', ['exponential', 1], ['zoom'], 15, 1, 20, 15];
+                layer.paint['line-opacity'] = [
+                  'case',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  1,
+                  ['boolean', ['feature-state', 'active'], false],
+                  1,
+                  0.6,
+                ];
+
+                // Set line width on zoom
+                layer.paint['line-width'] = ['interpolate', ['exponential', 1], ['zoom'], 15, 1, 22, 20];
               }
 
               return <Layer key={layer.id} {...layer} />;
